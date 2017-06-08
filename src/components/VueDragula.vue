@@ -4,7 +4,7 @@
     </div>
 </template>
 <script>
-    import makeDrake from '@/lib/dragula-singleton'
+    import makeDrake from '../lib/dragula-singleton'
     export default{
       props: {
         value: {
@@ -47,13 +47,20 @@
             }
           })
           drake.on('drop', (el, target, source, sibling) => {
-            if ([source, target].indexOf(this.$el) === -1) {
+            // If this element is not involved, or there is no source or target, skip
+            if ([source, target].indexOf(this.$el) === -1 || !source || !target) {
               return
             }
             let sourceModel = source.__vue__.value
             let targetModel = target.__vue__.value
             let transitModel = source.__vue__.value[sourceIndex]
             let targetIndex = this.elementIndex(sibling)
+
+            if (source === target) {
+              // I'm not 100% sure about this but it appears to solve some problems...
+              // possibly needs sourceIndex < targetIndex too?
+              targetIndex -= 1
+            }
 
             let newValue = this.value.slice()
 
